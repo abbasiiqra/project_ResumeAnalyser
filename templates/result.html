@@ -3,48 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Screening Result</title>
+    <title>Resume Screening Results</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
-            background-color: #f9f9f9;
         }
         h1 {
-            color: #4CAF50;
+            color: #0b0138;
         }
-        .result-box {
-            display: inline-block;
+        .result {
             margin-top: 20px;
-            padding: 20px;
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
-            background-color: white;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 1.2em;
+            color: #333241;
         }
-        .result-box p {
-            font-size: 18px;
+        .ats-score {
+            font-weight: bold;
+            color: #0b0138;
+        }
+        .back {
+            margin-top: 30px;
         }
         a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
             text-decoration: none;
-            color: white;
-            background-color: #4CAF50;
+            color: rgb(203, 197, 236);
+            background-color: #0b0138;
+            padding: 10px 20px;
             border-radius: 5px;
         }
         a:hover {
-            background-color: #45a049;
+            background-color: #0b0138;
         }
     </style>
 </head>
 <body>
-    <h1>Screening Result</h1>
-    <div class="result-box">
-        <p><strong>Prediction:</strong> {{ prediction }}</p>
+    <h1>Resume Screening Results</h1>
+    <div class="result">
+        <p>Your ATS Score: <span class="ats-score">{{ ats_score }}</span></p>
+        <p>Predicted Category: <span>{{ predicted_category }}</span></p>
     </div>
-    <a href="/">Go Back</a>
+    <div class="back">
+        <a href="/">Upload Another Resume</a>
+    </div>
 </body>
 </html>
