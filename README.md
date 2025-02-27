@@ -3,9 +3,13 @@ This project is a Flask-based web application for screening resumes using a mach
 Users can upload their resumes in various formats (PDF, DOCX, TXT), and the application predicts the category of resume.
 
 Features
+
 Upload resumes in PDF, DOCX, or TXT formats.
+
 Preprocesses and extracts text from uploaded resumes.
+
 Uses a pre-trained machine learning model for predictions.
+
 Displays the category of resume.
 
 Setup and Installation
