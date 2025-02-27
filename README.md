@@ -1,8 +1,13 @@
-Resume Screening Application
-This project is a Flask-based web application for screening resumes using a machine learning model. 
+*Resume Screening Application*
+
+
+This project is a Flask-based web application for screening resumes using a machine learning model.
+
 Users can upload their resumes in various formats (PDF, DOCX, TXT), and the application predicts the category of resume.
 
-Features
+
+Features:
+
 
 Upload resumes in PDF, DOCX, or TXT formats.
 
@@ -12,61 +17,90 @@ Uses a pre-trained machine learning model for predictions.
 
 Displays the category of resume.
 
-Setup and Installation
-1. Clone the Repository
-bash
-Copy code
+
+Setup and Installation:
+
+
+1. Clone the Repository-
+
 git clone https://github.com/your-username/resume-screening-app.git
+
 cd resume-screening-app
-2. Create a Virtual Environment
-bash
-Copy code
+
+3. Create a Virtual Environment-
+
 python -m venv venv
-Activate the virtual environment:
+
+Activate the virtual environment-
 
 Windows: venv\Scripts\activate
+
 Linux/Mac: source venv/bin/activate
-3. Install Dependencies
-bash
-Copy code
+
+3. Install Dependencies-
+   
 pip install -r requirements.txt
-4. Add Pre-trained Model and Vectorizer
+
+5. Add Pre-trained Model and Vectorizer-
+   
 Place your pre-trained model file (trained_model.pkl) and vectorizer file (vectorizer.pkl) in the project directory.
+
 Update the paths in the Python script if necessary.
-5. Create Necessary Directories
+
+7. Create Necessary Directories-
+
 Create an uploads directory for storing temporary uploaded files:
+
 mkdir uploads
-How to Run
+
+How to Run-
+
 Start the Flask server:
-bash
-Copy code
+
 python app.py
+
 Open your browser and navigate to:
-arduino
-Copy code
+
 http://127.0.0.1:5000/
 
 File Structure:
 
 resume-screening-app/
+
 ├── app.py                 # Main Flask application
+
 ├── requirements.txt       # List of Python dependencies
+
 ├── templates/
+
 │   ├── index.html         # Upload page
+
 │   ├── result.html        # Results display page
+
 │   ├── error.html         # Error display page
+
 ├── uploads/               # Temporary directory for uploaded files
+
 ├── trained_model.pkl      # Pre-trained ML model
+
 ├── vectorizer.pkl         # Pre-trained vectorizer
+
 └── README.md              # Project documentation
 
 Dependencies:
+
 Ensure the following libraries are installed (see requirements.txt):
+
 Flask
+
 scikit-learn
+
 pandas
+
 pickle5 (for loading the model/vectorizer)
+
 python-docx (optional, for DOCX processing)
+
 PyPDF2 (optional, for PDF processing)
 
 Install dependencies using:
