@@ -1,0 +1,12 @@
+pymupdf
+pathlib
+pandas
+spacy
+language_tool_python
+datetime
+numpy
+scikit-learn
+textblob
+pyPDF2 # newly added library for conversion of zip of pdfs to folder of extracted text files
+streamlit
+jupyter 

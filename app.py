@@ -1,117 +1,133 @@
-from flask import Flask, request, render_template, redirect, url_for
+import streamlit as st
+import tempfile
 import os
-import pickle
-import re
-from sklearn.feature_extraction.text import TfidfVectorizer
-from PyPDF2 import PdfReader
-from docx import Document
-from nltk.corpus import stopwords
-import nltk
+from model import resumemain
+import zipfile
+import base64
 
-# Download necessary NLTK resources
-nltk.download('stopwords')
-nltk.download('punkt')
+st.title('Resume Ranking Application')
 
-app = Flask(__name__)
+st.markdown("""
+    <style>
+    .description-box {
+        width: 80%;
+        padding: 10px;
+        /* background-color: #24292e;  GitHub dark grey */
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transition: all 0.3s ease-in-out;
+        color: #4CAF50; /* Green text */
+    }
 
-# Load pre-trained model and vectorizer
-MODEL_PATH = r'C:\Users\Asus\Desktop\project_ResumeAnalyser\trained_model.pkl'
-VECTORIZER_PATH = r'C:\Users\Asus\Desktop\project_ResumeAnalyser\vectorizer.pkl'
+    .description-box:hover {
+        white-space: normal;
+        overflow: visible;
+    }
+    </style>
 
-with open(MODEL_PATH, 'rb') as model_file:
-    model = pickle.load(model_file)
+<div>Simply upload a ZIP file with multiple resumes, optionally add a job description file, and let the app analyze and rank the resumes for you. 🚀    </div>
+""", unsafe_allow_html=True)
 
-with open(VECTORIZER_PATH, 'rb') as vec_file:
-    vectorizer = pickle.load(vec_file)
+with st.container():
+    st.subheader("Upload Files")
 
-# Allowed file extensions
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx'}
+    uploaded_file = st.file_uploader(
+        "Upload a zip file containing resume files",
+        type=['zip'],
+        key="resume_uploader"
+    )
 
-# Example ATS keywords
-ATS_KEYWORDS = ['Python', 'SQL', 'machine learning', 'data analysis', 'TensorFlow', 'AI', 'NLP']
+    job_description_file = st.file_uploader(
+        "Upload a job description text file (optional)",
+        type=['txt'],
+        key="jd_uploader"
+    )
 
-def allowed_file(filename):
-    """Check if the uploaded file has an allowed extension."""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+if uploaded_file:
+    st.success(f"✅ Resume file uploaded: {uploaded_file.name}")
 
-def clean_text(text):
-    """Clean and preprocess resume text."""
-    text = re.sub(r'http\S+', '', text)  # Remove URLs
-    text = re.sub(r'[^\w\s]', '', text)  # Remove punctuation
-    text = text.lower()  # Convert to lowercase
-    return text
+if job_description_file:
+    st.success(f"✅ Job description uploaded: {job_description_file.name}")
 
-def extract_text_from_file(file_path):
-    """Extract text from uploaded resume file."""
-    if file_path.endswith('.txt'):
-        with open(file_path, 'r') as file:
-            return file.read()
-    elif file_path.endswith('.pdf'):
-        reader = PdfReader(file_path)
-        return ' '.join(page.extract_text() for page in reader.pages)
-    elif file_path.endswith('.docx'):
-        doc = Document(file_path)
-        return ' '.join(paragraph.text for paragraph in doc.paragraphs)
+output_folder = "output"
+
+if st.button("Process Resumes"):
+    if uploaded_file is not None:
+        # Create a temporary directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Path to save the uploaded zip file
+            zip_path = os.path.join(temp_dir, uploaded_file.name)
+            with open(zip_path, 'wb') as f:
+                f.write(uploaded_file.getvalue())
+            
+            # Save job description if provided
+            job_description_path = None
+            if job_description_file:
+                job_description_path = os.path.join(temp_dir, job_description_file.name)
+                with open(job_description_path, 'wb') as f:
+                    f.write(job_description_file.getvalue())
+
+            # Process the zip file using the function from model.py
+            with st.spinner('Processing resumes...'):
+                results = resumemain(zip_path, job_description_path)
+
+            # Check if results are available
+            if results is not None and not results.empty:
+                st.success('Resumes processed successfully!')
+                st.write('### Results:')
+                st.dataframe(results)
+
+                # Provide option to download the results as CSV
+                csv = results.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="Download results as CSV",
+                    data=csv,
+                    file_name='resume_results.csv',
+                    mime='text/csv',
+                )
+
+                # Extract top 3 resume IDs
+                # top_3_ids = results['ID'].head(3).tolist()
+                top_3_ids = [str(i) for i in results['id'].head(3).tolist()]
+
+                extracted_pdfs = {}
+                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    zip_ref.extractall(temp_dir)
+                    for file_name in zip_ref.namelist():
+                        base_name = os.path.splitext(os.path.basename(file_name))[0]
+                        file_id = base_name.replace("candidate_", "")  # keep as-is
+                        if file_id in top_3_ids and file_name.lower().endswith('.pdf'):
+                            extracted_pdfs[file_id] = os.path.join(temp_dir, file_name)
+
+                
+                # Sort the extracted PDFs based on top_3_ids (so the highest-ranked comes first)
+                sorted_pdfs = sorted(extracted_pdfs.items(), key=lambda x: top_3_ids.index(x[0]))
+
+                # Display download buttons for top 3 resumes
+                st.write("### Top 3 Resumes (PDFs)")
+                if sorted_pdfs:
+                    for resume_id, pdf_path in sorted_pdfs:
+                        with open(pdf_path, "rb") as pdf_file:
+                            pdf_data = pdf_file.read()
+                            st.download_button(
+                                label=f"Download Resume {resume_id}",
+                                data=pdf_data,
+                                file_name=f"candidate_{resume_id}.pdf",
+                                mime="application/pdf"
+                            )
+
+                            # Embed PDF Viewer
+                            base64_pdf = base64.b64encode(pdf_data).decode()
+                            pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="500"></iframe>'
+                            st.markdown(pdf_display, unsafe_allow_html=True)
+                else:
+                    st.warning("No top resumes found in the zip file.")
+
+            else:
+                st.error("No valid results from the resume processing.")
     else:
-        return ""
-
-def calculate_ats_score(text):
-    """Calculate ATS score based on keyword matches."""
-    text = clean_text(text)
-    keywords = set(word.lower() for word in ATS_KEYWORDS)
-    words = set(text.split())
-    matching_keywords = keywords.intersection(words)
-    return len(matching_keywords)
-
-@app.route('/')
-def home():
-    """Render the home page."""
-    return render_template('index.html')
-
-@app.route('/get_predict', methods=['POST'])
-def get_predict():
-    """Handle file uploads, calculate ATS score, and display results."""
-    # Check if a file is part of the request
-    if 'file' not in request.files:
-        return render_template('error.html', message='No file part in the request')
-
-    file = request.files['file']
-
-    # Check if the file is valid
-    if file.filename == '':
-        return render_template('error.html', message='No file selected')
-    if file and allowed_file(file.filename):
-        file_path = os.path.join('uploads', file.filename)
-        file.save(file_path)
-
-        # Extract text from the uploaded file
-        resume_text = extract_text_from_file(file_path)
-        if not resume_text:
-            os.remove(file_path)
-            return render_template('error.html', message='Unable to extract text from the file')
-
-        # Preprocess resume and calculate ATS score
-        ats_score = calculate_ats_score(resume_text)
-        # Load LabelEncoder
-        with open('label_encoder.pkl', 'rb') as le_file:
-            label_encoder = pickle.load(le_file)
-
-
-        # Transform the text and predict category
-        processed_text = clean_text(resume_text)
-        input_vector = vectorizer.transform([processed_text])  # Transform text to vector
-        prediction = model.predict(input_vector)  # Predict using the model
-        predicted_category = label_encoder.inverse_transform(prediction)[0]
-
-        os.remove(file_path)  # Clean up the uploaded file
-
-        # Render the results page
-        return render_template('result.html', predicted_category= predicted_category, ats_score=ats_score)
-
-    return render_template('error.html', message='Invalid file format')
-
-if __name__ == '__main__':
-    # Ensure uploads directory exists
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
-    app.run(debug=True)
+        st.write('Please upload a zip file containing resume files.')
