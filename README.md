@@ -1,4 +1,4 @@
-<p align="center"><h1 align="center">Aplytic</h1></p>
+
 <p align="center">
 	<em><code>Automated AI Powered Resume Ranking & Analysis Tool</code></em>
 </p>
@@ -29,9 +29,6 @@
   - [Usage](#usage)
   - [Testing](#testing)
 - [Project Roadmap](#project-roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
 
 ---
 
@@ -130,31 +127,6 @@ This will start a local Streamlit server where you can:
 - [X] **Task 3:** Integrate more robust job description parsing and candidate matching features.
 - [X] **Task 4:** Improve UI/UX and add more visualization options in the Streamlit app.
 
----
-
-## Contributing
-
-- **💬 [Join the Discussions](https://LOCAL/GitHub/ResumeAnalyser/discussions):** Share insights, provide feedback, or ask questions.
-- **🐛 [Report Issues](https://LOCAL/GitHub/ResumeAnalyser/issues):** Submit bugs or request features.
-- **💡 [Submit Pull Requests](https://LOCAL/GitHub/ResumeAnalyser/blob/main/CONTRIBUTING.md):** Fork the repository, create a feature branch, and submit a PR.
-
-<details>
-<summary>Contributing Guidelines</summary>
-
-1. **Fork the Repository:** Fork the project to your account.  
-2. **Clone Locally:** Clone your forked repository.  
-       git clone https://github.com/yourusername/ResumeAnalyser.git  
-3. **Create a New Branch:**  
-       git checkout -b new-feature-x  
-4. **Make Your Changes:** Develop and test your changes locally.  
-5. **Commit Your Changes:**  
-       git commit -m "Implemented feature x."  
-6. **Push to Your Fork:**  
-       git push origin new-feature-x  
-7. **Submit a Pull Request:** Create a PR against the original repository with a clear description of your changes.  
-8. **Review:** Once reviewed and approved, your changes will be merged.  
-
-</details>
 
 ---
 
@@ -168,22 +140,6 @@ This will start a local Streamlit server where you can:
 - Incorporate weightage to personal recommendations on the basis of content of recommendation letters
 
 ---
-
-## License
-
-This project is protected under the [MIT](https://choosealicense.com/licenses/mit/#) License. For more details, please refer to the [LICENSE](https://choosealicense.com/licenses/) site.
-
----
-
-## Acknowledgments
-
-- **Developers:**
-  - **Samudraneel Sarkar**  
-    [LinkedIn](https://www.linkedin.com/in/samudraneel-sarkar) | [GitHub](https://github.com/samudraneel05) 
-  - **Guransh Goyal**  
-    [LinkedIn](https://www.linkedin.com/in/guransh-goyal) | [GitHub](https://github.com/GuranshGoyal) 
-- **Inspiration & Contributions:** Thanks to the open-source community for providing robust libraries (such as spaCy, scikit-learn, and Streamlit) that made this project possible.
-- **Other Resources:** Special thanks to language processing libraries like [language_tool_python](https://pypi.org/project/language-tool-python/) and [TextBlob](https://textblob.readthedocs.io/en/dev/) which help enhance the resume quality evaluation.
 
 
 
